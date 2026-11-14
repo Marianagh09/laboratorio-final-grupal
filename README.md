@@ -77,8 +77,9 @@ $S_1, S_2, S_3, S_4$:
 *   * Resultado de la Solución Óptima: Atiende 3 jornadas ($S_2, S_3, S_4$).
 
 **Cuantificacion del impacto**
-        * **Diferencia absoluta:** La regla actual deja de atender 2 jornadas completas en la subregion 
-        * **perdida relativa:** El procedimiento del coordinador desperdicia un 66.6% de la capacidad operativa de la unidad movil en esta instancia.
+
+    * **Diferencia absoluta:** La regla actual deja de atender 2 jornadas completas en la subregion 
+    * **perdida relativa:** El procedimiento del coordinador desperdicia un 66.6% de la capacidad operativa de la unidad movil en esta instancia.
 
 
 **Condicion contraria**
