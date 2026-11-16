@@ -83,3 +83,65 @@ $S_1, S_2, S_3, S_4$:
 
 **Condicion contraria**
 Para que la programacion dinamiaca de intervalos ponderados fuera la estrategia adecuada en lugar de la estrategia voraz de seleccion de actividades, el objetivo del negocio tendria que cambiar de maximizar la cantida de jornadas a maximizar el numero total de pacientes de alto riesgo atendidos, donde cada jornada tiene un peso diferente ($\text{pacientes}_i$) y elegir la jornada de menor duracion no garantiza acumular el mayor numero de pacientes. 
+---
+
+## Evaluación del desempeño (Operación 3: Jornadas de unidades móviles)
+
+### 1. Complejidad teórica
+- **Estrategia Voraz (Terminación más temprana):** $\Theta(n \log n)$ en tiempo (dominado por el ordenamiento por hora de finalización, seguido de una pasada lineal $\Theta(n)$) y $\Theta(n)$ en espacio auxiliar.
+- **Enfoque Exhaustivo (Fuerza bruta):** $\Theta(n \cdot 2^n)$ en tiempo (evalúa los $2^n$ subconjuntos posibles y valida compatibilidad en hasta $n$ pasos) y $\Theta(n)$ en espacio.
+- **Regla Actual (Orden de llegada):** $\Theta(n)$ en tiempo y $\Theta(n)$ en espacio, pero subóptima en calidad de solución.
+
+### 2. Verificación experimental y pruebas unitarias
+La corrección funcional se validó mediante [`pruebas.py`](src/jornadas_unidades/pruebas.py) y [`datos.py`](src/jornadas_unidades/datos.py) (semilla fija `2026`), cubriendo:
+- Casos límite: lista vacía, una sola solicitud, solicitudes totalmente traslapadas y jornadas encadenadas en los extremos ($s_i = f_{i-1}$).
+- El contraejemplo calculado a mano ($S_1, S_2, S_3, S_4$), confirmando que la regla actual acepta 1 jornada mientras la estrategia voraz obtiene las 3 óptimas sin cruces.
+- 25 instancias aleatorias pequeñas donde `estrategia_voraz` iguala exactamente el número máximo de jornadas hallado por `exhaustivo` sin producir solapamientos.
+
+### 3. Resultados experimentales y contraste empírico
+Las mediciones se realizaron en [`medicion.py`](src/jornadas_unidades/medicion.py) cronometrando únicamente la ejecución algorítmica con `time.perf_counter()` (promediando 10 repeticiones para la voraz y 3 para la exhaustiva) y contando comparaciones elementales.
+
+#### Experimento A: Comparación directa frente al enfoque exhaustivo
+| $N$ (solicitudes) | Voraz (ms) | Exhaustivo (ms) | Regla Actual (ms) | Ops Voraz | Ops Exhaustivo |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| 4 | 0.0021 | 0.0136 | 0.0009 | 8 | 40 |
+| 6 | 0.0022 | 0.0360 | 0.0007 | 14 | 232 |
+| 8 | 0.0028 | 0.1745 | 0.0007 | 24 | 1,712 |
+| 10 | 0.0018 | 0.5749 | 0.0009 | 30 | 8,216 |
+| 12 | 0.0024 | 1.8519 | 0.0007 | 38 | 48,192 |
+| 14 | 0.0027 | 7.4732 | 0.0011 | 51 | 258,432 |
+| 16 | 0.0051 | 25.2141 | 0.0010 | 62 | 1,272,832 |
+
+#### Experimento B: Escalabilidad de la estrategia voraz al duplicar $N$
+| $N$ (solicitudes) | Voraz (ms) | Factor tiempo | Ops Voraz | Factor operaciones |
+| :---: | :---: | :---: | :---: | :---: |
+| 100 | 0.0137 | — | 635 | — |
+| 1,000 | 0.1425 | — | 9,714 | — |
+| 2,000 | 0.4084 | $2.87\times$ | 21,405 | $2.20\times$ |
+| 4,000 | 1.1598 | $2.84\times$ | 46,879 | $2.19\times$ |
+| 8,000 | 2.4323 | $2.10\times$ | 101,589 | $2.17\times$ |
+| 16,000 | 6.0262 | $2.48\times$ | 219,316 | $2.16\times$ |
+| 32,000 | 10.5287 | $1.75\times$ | 470,712 | $2.15\times$ |
+| 64,000 | 28.7519 | $2.73\times$ | 1,004,920 | $2.13\times$ |
+
+**Contraste teórico vs. empírico:**
+- **Enfoque Exhaustivo:** Al pasar de $N = 8$ ($0.1745\text{ ms}$, $1.712\text{ ops}$) a $N = 16$ ($25.2141\text{ ms}$, $1.272.832\text{ ops}$), el tiempo se multiplicó por $144.5\times$ (cercano al factor teórico $2 \cdot 2^8 = 512\times$ de $\Theta(n \cdot 2^n)$), confirmando el crecimiento exponencial.
+- **Estrategia Voraz:** Al duplicar $N$ (por ejemplo, de $8.000$ a $16.000$ y de $32.000$ a $64.000$), las operaciones elementales crecen por un factor estable de **$2.13\times$ a $2.20\times$** ("un poco más del doble"), coincidiendo exactamente con la firma matemática $\frac{2n \log_2(2n)}{n \log_2 n} = 2\left(1 + \frac{1}{\log_2 n}\right)$ de $\Theta(n \log n)$.
+
+![Tiempo vs N](graficas/jornadas_unidades/tiempo_vs_n.png)
+
+![Operaciones vs N](graficas/jornadas_unidades/operaciones_vs_n.png)
+
+### 4. Extrapolación al volumen real y consumo energético (Implicaciones ambientales)
+- **Volumen real del caso:** 9 subregiones, con entre $40$ y $120$ solicitudes mensuales cada una (peor caso: $N = 120$ por subregión), ejecutado en un servidor de $380\text{ W}$ ($0.38\text{ kW}$). Como referencia operativa, la programación mensual debe resolverse dentro de una ventana de planeación nocturna de $1\text{ hora}$ ($3.600\text{ s}$).
+- **Estimación Estrategia Voraz:** Partiendo de la medición empírica para $N = 100$ ($0.0137\text{ ms}$) y escalando bajo $\Theta(n \log n)$ hasta $N = 120$, cada subregión toma $\approx 0.017\text{ ms}$. Para las 9 subregiones en conjunto, el tiempo total mensual es de **$0.15\text{ ms}$ ($0.00015\text{ s}$)**, cumpliendo ampliamente con la ventana operativa.
+  - *Consumo energético:* $0.38\text{ kW} \times \frac{0.00015}{3600}\text{ h} \approx 1.58 \times 10^{-8}\text{ kWh/mes}$ ($1.90 \times 10^{-7}\text{ kWh/año}$).
+- **Estimación Regla Actual:** Con complejidad $\Theta(n)$, para $N = 120$ en 9 subregiones tarda $\approx 0.010\text{ ms}$ totales ($1.06 \times 10^{-8}\text{ kWh/mes}$ o $1.27 \times 10^{-7}\text{ kWh/año}$). La diferencia anual de consumo eléctrico frente a la estrategia voraz es despreciable ($\approx 6.3 \times 10^{-8}\text{ kWh/año}$), pero la estrategia voraz elimina el desperdicio operativo de unidades móviles subutilizadas.
+- **Estimación Enfoque Exhaustivo:** Partiendo de $N = 16$ ($25.21\text{ ms}$) y proyectando bajo $\Theta(n \cdot 2^n)$ hasta $N = 120$, el factor de crecimiento es $\frac{120}{16} \cdot 2^{104} \approx 1.52 \times 10^{32}$. Una sola subregión tardaría $\approx 1.2 \times 10^{23}\text{ años}$, por lo que **sencillamente no terminaría** y es inviable para operación real.
+
+---
+
+## Instrucciones de ejecución (Pruebas y Medición)
+Con el entorno virtual activado y las dependencias instaladas (`pip install -r requirements.txt`):
+- **Ejecutar pruebas unitarias:** `python3 src/jornadas_unidades/pruebas.py`
+- **Ejecutar experimentos y regenerar gráficas:** `python3 src/jornadas_unidades/medicion.py`
