@@ -1,40 +1,37 @@
-"""Búsqueda exhaustiva para validar la estrategia voraz."""
-
+"""Búsqueda exhaustiva para la programación de jornadas (Plataforma Pulso)."""
 from itertools import product
 from datos import Jornada
 
+
 def exhaustivo(solicitudes: list[Jornada]) -> list[Jornada]:
-    """Prueba todas las combinaciones posibles para hallar el máximo de jornadas.
-    
+    """Elige el máximo número de jornadas compatibles probando todos los subconjuntos.
+
+    Ordena previamente por hora de fin para validar cada subconjunto
+    comparando únicamente con la última jornada aceptada.
+
     Args:
         solicitudes: Lista de tuplas (inicio, fin, pacientes).
-        
+
     Returns:
-        Lista de las jornadas óptimas.
+        Subconjunto compatible de tamaño máximo.
     """
     n = len(solicitudes)
-    if n == 0:
-        return []
-        
-    mejor_combinacion = []
-    
-    # Genera todas las combinaciones binarias (0 y 1) para n elementos
-    # product([0, 1], repeat=n) devuelve tuplas como (0,0,1,0...)
-    for interruptores in product([0, 1], repeat=n):
-        combinacion_actual = []
+    ordenadas = sorted(solicitudes, key=lambda x: x[1])
+    mejor_combinacion: list[Jornada] = []
+
+    for mascara in product([0, 1], repeat=n):
+        combinacion_actual: list[Jornada] = []
         es_valida = True
-        
         for i in range(n):
-            if interruptores[i] == 1: # Si el interruptor está encendido, entra
-                # Verificamos si choca con la última que metimos
+            if mascara[i] == 1:
                 if combinacion_actual:
                     ultimo_fin = combinacion_actual[-1][1]
-                    if solicitudes[i][0] < ultimo_fin:
+                    if ordenadas[i][0] < ultimo_fin:
                         es_valida = False
-                        break # Choca, descartamos esta combinación
-                combinacion_actual.append(solicitudes[i])
-                
+                        break
+                combinacion_actual.append(ordenadas[i])
+
         if es_valida and len(combinacion_actual) > len(mejor_combinacion):
             mejor_combinacion = combinacion_actual
-            
+
     return mejor_combinacion
