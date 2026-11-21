@@ -83,9 +83,7 @@ $S_1, S_2, S_3, S_4$:
 
 **Condicion contraria**
 Para que la programacion dinamiaca de intervalos ponderados fuera la estrategia adecuada en lugar de la estrategia voraz de seleccion de actividades, el objetivo del negocio tendria que cambiar de maximizar la cantida de jornadas a maximizar el numero total de pacientes de alto riesgo atendidos, donde cada jornada tiene un peso diferente ($\text{pacientes}_i$) y elegir la jornada de menor duracion no garantiza acumular el mayor numero de pacientes. 
-<<<<<<< HEAD
 
-=======
 ---
 
 ## Evaluación del desempeño (Operación 3: Jornadas de unidades móviles)
@@ -148,4 +146,4 @@ Las mediciones se realizaron en [`medicion.py`](src/jornadas_unidades/medicion.p
 Con el entorno virtual activado y las dependencias instaladas (`pip install -r requirements.txt`):
 - **Ejecutar pruebas unitarias:** `python3 src/jornadas_unidades/pruebas.py`
 - **Ejecutar experimentos y regenerar gráficas:** `python3 src/jornadas_unidades/medicion.py`
->>>>>>> d1bf0ae2747f11e686664169dfbcf4a58f663dbd
+
