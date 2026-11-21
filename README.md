@@ -147,3 +147,51 @@ Con el entorno virtual activado y las dependencias instaladas (`pip install -r r
 - **Ejecutar pruebas unitarias:** `python3 src/jornadas_unidades/pruebas.py`
 - **Ejecutar experimentos y regenerar gráficas:** `python3 src/jornadas_unidades/medicion.py`
 
+
+
+## Operación 2 — Lista Diaria de Llamadas (1.450.000 Registros)
+
+> **Enlaces al código de la Operación 2:**
+> * Generador de datos sintéticos: [`src/ordenamiento_llamadas/datos.py\`](src/ordenamiento_llamadas/datos.py)
+> * Algoritmo optimizado Merge Sort: [`src/ordenamiento_llamadas/estrategia.py`](src/ordenamiento_llamadas/estrategia.py)
+> * Procedimiento heredado Insertion Sort: [`src/ordenamiento_llamadas/regla_actual.py`](src/ordenamiento_llamadas/regla_actual.py)
+
+### 1. Análisis del Problema (Operación 2)
+
+* **Entradas:** 
+* Un volumen masivo diario de $N = 1.450.000$ registros pendientes de gestión almacenados en la plataforma. 
+* Cada registro es una tupla: $(\text{tipo\_doc}, \text{num\_doc}, \text{id\_lab}, \text{fecha\_resultado}, \text{indice\_riesgo}, \text{municipio})$, donde $\text{indice\_riesgo} \in [6]$. 
+* **Salidas:** 
+* La lista de exactamente $9.000$ pacientes seleccionados para ser contactados por el call center durante la jornada. 
+* **Restricción del Negocio:** 
+* **Prioridad Estricta por Riesgo:** Ningún paciente con menor riesgo puede quedar ubicado por encima de uno con mayor riesgo que haya sido excluido. 
+* **Criterio de Desempate por Antigüedad:** A igual índice de riesgo, se debe priorizar el resultado con la fecha más antigua. 
+* **Ventana Nocturna Estricta:** Las Operaciones 1 y 2 deben completarse conjuntamente dentro de una ventana inflexible de 4 horas (01:00 a. m. a 05:00 a. m.). 
+--- 
+### 2. Diseño de la Solución y Ejemplo Resuelto a Mano 
+
+#### Por qué el problema admite Merge Sort ($\Theta(N \log N)$) 
+El problema de generar la lista diaria exige un ordenamiento determinista por dos claves (riesgo descendente y fecha ascendente). *Merge Sort* es ideal porque: 
+1. Aplica el paradigma de **Divide y Vencerás**, garantizando una complejidad determinista $\Theta(N \log N)$ en el mejor, promedio y peor caso. 
+2. Es un algoritmo **Estable**, lo que preserva el orden relativo temporal exacto de los registros sin alterar la antigüedad del paciente. 
+#### Ejemplo Resuelto a Mano (4 Registros): 
+Considere los siguientes 4 registros recibidos en la plataforma: 
+* $R_1$: Doc 101, Riesgo: 85, Fecha: "2026-11-10 10:00" 
+* $R_2$: Doc 102, Riesgo: 95, Fecha: "2026-11-12 08:00" 
+* $R_3$: Doc 103, Riesgo: 85, Fecha: "2026-11-05 14:00" 
+* $R_4$: Doc 104, Riesgo: 60, Fecha: "2026-11-15 09:00" 
+
+**Paso 1 (División):** Se divide la lista en dos mitades de 2 elementos: 
+* Izquierda: $[R_1, R_2]$, Derecha: $[R_3, R_4]$. 
+
+**Paso 2 (Conquista y Mezcla local):** 
+* Mitad izquierda ordenada por riesgo: $[R_2 \text{ (95)}, R_1 \text{ (85)}]$. 
+* Mitad derecha ordenada por riesgo: $[R_3 \text{ (85)}, R_4 \text{ (60)}]$. 
+
+**Paso 3 (Mezcla Final con Desempate):** 
+1. Compara $R_2$ (95) vs $R_3$ (85) $\rightarrow$ Elige $R_2$. 
+2. Compara $R_1$ (85) vs $R_3$ (85) $\rightarrow$ Empate en riesgo. Evalúa fechas ("2026-11-10" vs "2026-11-05"). $R_3$ es más antiguo $\rightarrow$ Elige $R_3$. 
+3. Compara $R_1$ (85) vs $R_4$ (60) $\rightarrow$ Elige $R_1$. 
+4. Anexa el sobrante $R_4$. 
+
+**Resultado Final Ordenado:** $[R\_2, R\_3, R\_1, R\_4]$.
