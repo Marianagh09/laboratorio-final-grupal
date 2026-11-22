@@ -287,3 +287,33 @@ Corriendo 11 pruebas...
   [OK] prueba_misma_cantidad_de_registros
   [OK] prueba_es_mayor_o_igual
 Listo, las 11 pruebas pasaron bien.
+
+#### 3.3 Resultados experimentales y contraste empírico
+
+Las mediciones se realizaron en [`medicion.py`](src/ordenamiento_llamadas/medicion.py) cronometrando únicamente la ejecución algorítmica con `time.perf_counter()`, con semilla fija (42). Los tiempos son aproximados y dependen del equipo donde se corran, pero el número de comparaciones es determinista.
+
+*Experimento A: Medición directa de tiempos y operaciones*
+
+<table><table><tr><td>\(N\) | Merge Sort (s) | Merge (cmp) | Insertion Sort (s) | Insertion (cmp) |</td></tr><tr><td>| :---: | :---: | :---: | :---: | :---: |</td></tr><tr><td>| 100 | 0.00031 | 538 | 0.00044 | 2,769 |</td></tr><tr><td>| 200 | 0.00043 | 1,277 | 0.00188 | 11,042 |</td></tr><tr><td>| 400 | 0.00087 | 2,940 | 0.00677 | 41,388 |</td></tr><tr><td>| 800 | 0.00212 | 6,685 | 0.02625 | 155,822 |</td></tr><tr><td>| 1,600 | 0.00429 | 15,016 | 0.10290 | 632,359 |</td></tr><tr><td>| 3,200 | 0.00887 | 33,210 | 0.39316 | 2,553,655 |</td></tr><tr><td>| 6,400 | 0.02249 | 72,920 | 1.73321 | 10,267,844 |</td></tr></table></table>
+
+**Contraste teórico vs. empírico:**
+* **Merge Sort:** Al pasar de \(N=3.200\) a \(N=6.400\) el tiempo creció más o menos **\(2.5\times\)** y las comparaciones **\(2.2\times\)**. La teoría dice que con \(N \log N\) el factor debería ser cercano a 2.1, así que coincide (la diferencia en tiempo es por el ruido del procesador).
+* **Insertion Sort:** Al doble de \(N\) el tiempo creció casi **\(4.4\times\)** y las comparaciones casi **\(4\times\)**. Eso es exactamente lo que uno espera con \(N^2\).
+* A medida que \(N\) crece la diferencia entre los dos se hace enorme: con \(N=100\) el Merge es solo 1.4 veces más rápido, pero con \(N=6.400\) ya es como **77 veces más rápido**. Por eso el Insertion no sirve para el volumen real.
+
+**Gráficas generadas:**
+
+![Tiempo vs N](graficas/ordenamiento_llamadas/tiempo_vs_n.png)
+
+![Operaciones vs N](graficas/ordenamiento_llamadas/operaciones_vs_n.png)
+
+#### 3.4 Extrapolación al volumen real y consumo energético
+
+Para estimar el consumo anual supusimos:
+* Un computador del call center gasta unos **200 W** (0.2 kW).
+* La operación se corre **una vez al día**, 365 días al año.
+* Extrapolamos con el modelo de complejidad de cada uno (\(N \log N\) para Merge, \(N^2\) para Insertion).
+
+<table><table><tr><td>Estrategia | Tiempo con \(N=1.450.000\) | Consumo estimado al año |</td></tr><tr><td>| :--- | :---: | :---: |</td></tr><tr><td>| Merge Sort (propuesto) | ~8.2 s (0.14 min) | ~0.17 kWh/año |</td></tr><tr><td>| Insertion Sort (actual) | ~88,967 s (24.7 h) | ~1,804 kWh/año |</td></tr></table></table>
+
+El ahorro es de aproximadamente **1.804 kWh al año** (más del 99.99% menos consumo). Con Merge Sort el proceso deja de ser un problema energético y además **cabe de sobra** en la ventana nocturna de 4 horas.
