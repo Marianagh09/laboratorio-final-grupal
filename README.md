@@ -138,6 +138,17 @@ Las mediciones se realizaron en `medicion.py` cronometrando únicamente la ejecu
 * **Estimación regla actual:** Con complejidad $\Theta(n)$, para $N = 120$ en $9$ subregiones tarda $\approx 0.010\text{ ms}$ totales ($1.06 \times 10^{-8}\text{ kWh/mes}$ o $1.27 \times 10^{-7}\text{ kWh/año}$). La diferencia anual de consumo eléctrico frente a la estrategia voraz es despreciable ($\approx 6.3 \times 10^{-8}\text{ kWh/año}$), pero la estrategia voraz elimina el desperdicio operativo de unidades móviles subutilizadas.
 * **Estimación enfoque exhaustivo:** Partiendo de $N = 16$ ($25.21\text{ ms}$) y proyectando bajo $\Theta(n \cdot 2^n)$ hasta $N = 120$, el factor de crecimiento es $\frac{120}{16} \cdot 2^{104} \approx 1.52 \times 10^{32}$. Una sola subregión tardaría $\approx 1.2 \times 10^{23}\text{ años}$, por lo que sencillamente no terminaría y es inviable para operación real.
 
+
+### Gráficas de desempeño — Jornadas de Unidades Móviles
+
+**Tiempo de ejecución frente al tamaño de entrada:**
+
+![Tiempo vs N - Jornadas](graficas/jornadas_unidades/tiempo_vs_n.png)
+
+**Número de operaciones frente al tamaño de entrada:**
+
+![Operaciones vs N - Jornadas](graficas/jornadas_unidades/operaciones_vs_n.png)
+
 ---
 
 ## Operación 2 — Lista Diaria de Llamadas (1.450.000 Registros)
@@ -304,3 +315,16 @@ Con el repositorio clonado y ubicado en la raíz del proyecto:
    python src/ordenamiento_llamadas/pruebas.py
    python src/ordenamiento_llamadas/medicion.py
    ```
+### 3. Conclusiones
+
+El análisis de las dos operaciones seleccionadas de Plataforma Pulso permitió comprobar que escoger una estrategia algorítmica adecuada tiene un efecto directo tanto en el rendimiento del sistema como en la calidad del servicio.
+
+En la programación de jornadas de las unidades móviles, la estrategia voraz por terminación más temprana permite maximizar el número de jornadas compatibles y evita que una solicitud extensa bloquee varias jornadas más cortas. Las pruebas realizadas mostraron que la estrategia obtiene el mismo número óptimo de jornadas que el enfoque exhaustivo en las instancias pequeñas utilizadas para validación, pero sin presentar su crecimiento exponencial.
+
+Para la lista diaria de llamadas, Merge Sort presenta una mejor escalabilidad que Insertion Sort. Su complejidad Theta(N log N) permite trabajar con el volumen diario de registros de una forma mucho más adecuada que el procedimiento cuadrático Theta(N^2). Esta diferencia se vuelve todavía más importante en el escenario futuro de 2.900.000 registros.
+
+El análisis también mostró que una solución no debe evaluarse únicamente por su velocidad. En Plataforma Pulso es necesario conservar la trazabilidad de los datos, proteger la información sensible de los pacientes y mantener criterios verificables de priorización. Un error en la consolidación o en el ordenamiento puede afectar directamente qué personas son contactadas o reciben atención.
+
+Desde el punto de vista ambiental, reducir el tiempo de procesamiento también reduce el tiempo durante el cual el servidor de 380 W permanece bajo carga. Por esta razón, mejorar la complejidad algorítmica contribuye simultáneamente al cumplimiento de la ventana operativa y a disminuir el consumo energético asociado al procesamiento.
+
+Como recomendación final, el equipo propone mantener la estrategia voraz para la programación de jornadas cuando el objetivo sea maximizar su cantidad y utilizar Merge Sort para ordenar la lista diaria de llamadas. Si en el futuro cambia el objetivo del negocio, por ejemplo hacia maximizar el número de pacientes de alto riesgo atendidos, también deberá revisarse la estrategia algorítmica utilizada.
