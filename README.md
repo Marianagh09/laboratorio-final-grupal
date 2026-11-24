@@ -304,3 +304,16 @@ Con el repositorio clonado y ubicado en la raíz del proyecto:
    python src/ordenamiento_llamadas/pruebas.py
    python src/ordenamiento_llamadas/medicion.py
    ```
+### 3. Conclusiones
+
+El análisis de las dos operaciones seleccionadas de Plataforma Pulso permitió comprobar que escoger una estrategia algorítmica adecuada tiene un efecto directo tanto en el rendimiento del sistema como en la calidad del servicio.
+
+En la programación de jornadas de las unidades móviles, la estrategia voraz por terminación más temprana permite maximizar el número de jornadas compatibles y evita que una solicitud extensa bloquee varias jornadas más cortas. Las pruebas realizadas mostraron que la estrategia obtiene el mismo número óptimo de jornadas que el enfoque exhaustivo en las instancias pequeñas utilizadas para validación, pero sin presentar su crecimiento exponencial.
+
+Para la lista diaria de llamadas, Merge Sort presenta una mejor escalabilidad que Insertion Sort. Su complejidad Theta(N log N) permite trabajar con el volumen diario de registros de una forma mucho más adecuada que el procedimiento cuadrático Theta(N^2). Esta diferencia se vuelve todavía más importante en el escenario futuro de 2.900.000 registros.
+
+El análisis también mostró que una solución no debe evaluarse únicamente por su velocidad. En Plataforma Pulso es necesario conservar la trazabilidad de los datos, proteger la información sensible de los pacientes y mantener criterios verificables de priorización. Un error en la consolidación o en el ordenamiento puede afectar directamente qué personas son contactadas o reciben atención.
+
+Desde el punto de vista ambiental, reducir el tiempo de procesamiento también reduce el tiempo durante el cual el servidor de 380 W permanece bajo carga. Por esta razón, mejorar la complejidad algorítmica contribuye simultáneamente al cumplimiento de la ventana operativa y a disminuir el consumo energético asociado al procesamiento.
+
+Como recomendación final, el equipo propone mantener la estrategia voraz para la programación de jornadas cuando el objetivo sea maximizar su cantidad y utilizar Merge Sort para ordenar la lista diaria de llamadas. Si en el futuro cambia el objetivo del negocio, por ejemplo hacia maximizar el número de pacientes de alto riesgo atendidos, también deberá revisarse la estrategia algorítmica utilizada.
