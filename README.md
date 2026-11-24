@@ -138,6 +138,17 @@ Las mediciones se realizaron en `medicion.py` cronometrando únicamente la ejecu
 * **Estimación regla actual:** Con complejidad $\Theta(n)$, para $N = 120$ en $9$ subregiones tarda $\approx 0.010\text{ ms}$ totales ($1.06 \times 10^{-8}\text{ kWh/mes}$ o $1.27 \times 10^{-7}\text{ kWh/año}$). La diferencia anual de consumo eléctrico frente a la estrategia voraz es despreciable ($\approx 6.3 \times 10^{-8}\text{ kWh/año}$), pero la estrategia voraz elimina el desperdicio operativo de unidades móviles subutilizadas.
 * **Estimación enfoque exhaustivo:** Partiendo de $N = 16$ ($25.21\text{ ms}$) y proyectando bajo $\Theta(n \cdot 2^n)$ hasta $N = 120$, el factor de crecimiento es $\frac{120}{16} \cdot 2^{104} \approx 1.52 \times 10^{32}$. Una sola subregión tardaría $\approx 1.2 \times 10^{23}\text{ años}$, por lo que sencillamente no terminaría y es inviable para operación real.
 
+
+### Gráficas de desempeño — Jornadas de Unidades Móviles
+
+**Tiempo de ejecución frente al tamaño de entrada:**
+
+![Tiempo vs N - Jornadas](graficas/jornadas_unidades/tiempo_vs_n.png)
+
+**Número de operaciones frente al tamaño de entrada:**
+
+![Operaciones vs N - Jornadas](graficas/jornadas_unidades/operaciones_vs_n.png)
+
 ---
 
 ## Operación 2 — Lista Diaria de Llamadas (1.450.000 Registros)
